@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: #f4f4f4;
+        padding: 30px;
+    }
+    #card {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        font-size: 22px;
+        min-height: 100px;
+        margin-bottom: 20px;
+    }
+    button {
+        font-size: 18px;
+        padding: 10px 20px;
+        margin: 5px;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>Patent Flashcards</h2>
+
+<div id="card">Tap Start</div>
+
+<button onclick="start()">Start</button>
+<button onclick="pauseResume()" id="pauseBtn">Pause</button>
+
+<script>
+const cards = [
+    ["100 ?", "Secrecy and access."],
+    ["200 ?", "Application types."],
+    ["300 ?", "Ownership and assignment."],
+    ["400 ?", "Representative of owner or applicant."],
+    ["500 ?", "Receipt of mail and papers."],
+    ["600 ?", "Content of application."],
+    ["700 ?", "Examination."],
+    ["800 ?", "Double patenting and restriction."],
+    ["900 ?", "Prior art."],
+    ["1000 ?", "Matters decided by USPTO officials."],
+    ["1100 ?", "SIR, PGPub, Preissuance Submissions."],
+    ["1200 ?", "Appeal."],
+    ["1300 ?", "Allowance and issue."],
+    ["1400 ?", "Corrections and reissue."],
+    ["1500 ?", "Design patents."],
+    ["1600 ?", "Plant patents."],
+    ["1800 ?", "PCT."],
+    ["1900 ?", "Protest."],
+    ["2000 ?", "Duty of disclosure."],
+    ["2100 ?", "Patentability."],
+    ["2200 ?", "Ex parte reexamination."],
+    ["2300 ?", "Interference and derivation proceedings."],
+    ["2400 ?", "Biotechnology."],
+    ["2500 ?", "Maintenance fees."],
+    ["2600 ?", "Inter partes reexamination."],
+    ["2700 ?", "Patent term, adjustments, and extensions."],
+    ["2800 ?", "Supplemental examination."]
+];
+
+let index = 0;
+let paused = false;
+let timer = null;
+
+function speak(text) {
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate = 0.9;
+    utter.pitch = 1;
+    speechSynthesis.speak(utter);
+}
+
+function start() {
+    paused = false;
+    shuffle(cards);
+    index = 0;
+    showCard();
+}
+
+function showCard() {
+    if (paused) return;
+
+    const [question, answer] = cards[index];
+
+    document.getElementById("card").innerText = question;
+    speak(question);
+
+    timer = setTimeout(() => {
+        if (paused) return;
+
+        document.getElementById("card").innerText = answer;
+        speak(answer);
+
+        timer = setTimeout(() => {
+            if (paused) return;
+            index = (index + 1) % cards.length;
+            showCard();
+        }, 3000);
+
+    }, 3000);
+}
+
+function pauseResume() {
+    const btn = document.getElementById("pauseBtn");
+
+    if (!paused) {
+        paused = true;
+        speechSynthesis.cancel();
+        clearTimeout(timer);
+        btn.innerText = "Resume";
+    } else {
+        paused = false;
+        btn.innerText = "Pause";
+        showCard();
+    }
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log('Service Worker registered successfully.'))
+    .catch((err) => console.log('Service Worker registration failed:', err));
+}
+</script>
+
+</body>
+</html>
