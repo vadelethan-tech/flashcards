@@ -95,7 +95,13 @@ function showAnswer() {
 }
 
 function nextCard() {
-    index = (index + 1) % cards.length;
+    let newIndex;
+
+    do {
+        newIndex = Math.floor(Math.random() * cards.length);
+    } while (newIndex === index);
+
+    index = newIndex;
     renderQuestion();
 }
 
